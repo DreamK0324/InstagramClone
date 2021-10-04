@@ -37,6 +37,7 @@ public class MainActivity extends AppCompatActivity {
     private ImageView ivPostImage;
     private Button btnCaptureImage;
     private Button btnSubmit;
+    private Button btnLogOut;
     private File photoFile;
     public String photoFileName = "photo.jpg";
 
@@ -49,6 +50,7 @@ public class MainActivity extends AppCompatActivity {
         ivPostImage = findViewById(R.id.ivPostImage);
         btnCaptureImage = findViewById(R.id.btnCaptureImage);
         btnSubmit = findViewById(R.id.btnSubmit);
+        btnLogOut = findViewById(R.id.btnLogOut);
 
         btnCaptureImage.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -57,7 +59,8 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        //queryPosts();
+        queryPosts();
+
         btnSubmit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -74,6 +77,22 @@ public class MainActivity extends AppCompatActivity {
                 savePost(description, currentUser, photoFile);
             }
         });
+
+        btnLogOut.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ParseUser.logOut();
+                ParseUser currentUser = ParseUser.getCurrentUser();
+                goLoginActivity();
+                Toast.makeText(MainActivity.this, "Successfully logged out!", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void goLoginActivity() {
+        Intent i = new Intent(MainActivity.this,LoginActivity.class);
+        startActivity(i);
+        finish();
     }
 
     private void savePost(String description, ParseUser currentUser, File photoFile) {
@@ -95,6 +114,7 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+
     private void launchCamera() {
         // create Intent to take a picture and return control to the calling application
         Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
@@ -113,56 +133,57 @@ public class MainActivity extends AppCompatActivity {
             // Start the image capture intent to take photo
             startActivityForResult(intent, CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE);
         }
+    }
 
-        @Override
-        protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data){
-            super.onActivityResult(requestCode, resultCode, data);
-            if (requestCode == CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE) {
-                if (resultCode == RESULT_OK) {
-                    // by this point we have the camera photo on disk
-                    Bitmap takenImage = BitmapFactory.decodeFile(photoFile.getAbsolutePath());
-                    // RESIZE BITMAP, see section below
-                    // Load the taken image into a preview
-                    ivPostImage.setImageBitmap(takenImage);
-                } else { // Result was a failure
-                    Toast.makeText(this, "Picture wasn't taken!", Toast.LENGTH_SHORT).show();
-                }
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data){
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE) {
+            if (resultCode == RESULT_OK) {
+                // by this point we have the camera photo on disk
+                Bitmap takenImage = BitmapFactory.decodeFile(photoFile.getAbsolutePath());
+                // RESIZE BITMAP, see section below
+                // Load the taken image into a preview
+                ivPostImage.setImageBitmap(takenImage);
+            } else { // Result was a failure
+                Toast.makeText(this, "Picture wasn't taken!", Toast.LENGTH_SHORT).show();
             }
-        }
-
-
-        // Returns the File for a photo stored on disk given the fileName
-        public File getPhotoFileUri (String fileName){
-            // Get safe storage directory for photos
-            // Use `getExternalFilesDir` on Context to access package-specific directories.
-            // This way, we don't need to request external read/write runtime permissions.
-            File mediaStorageDir = new File(getExternalFilesDir(Environment.DIRECTORY_PICTURES), TAG);
-
-            // Create the storage directory if it does not exist
-            if (!mediaStorageDir.exists() && !mediaStorageDir.mkdirs()) {
-                Log.d(TAG, "failed to create directory");
-            }
-
-            // Return the file target for the photo based on filename
-            return new File(mediaStorageDir.getPath() + File.separator + fileName);
-        }
-
-
-        private void queryPosts () {
-            ParseQuery<Post> query = ParseQuery.getQuery(Post.class);
-            query.include(Post.KEY_USER);
-            query.findInBackground(new FindCallback<Post>() {
-                @Override
-                public void done(List<Post> posts, ParseException e) {
-                    if (e != null) {
-                        Log.e(TAG, "Issue with getting posts", e);
-                        return;
-                    }
-                    for (Post post : posts) {
-                        Log.i(TAG, "Post: " + post.getDescription() + ", username: " + post.getUser().getUsername());
-                    }
-                }
-            });
         }
     }
+
+
+    // Returns the File for a photo stored on disk given the fileName
+    public File getPhotoFileUri (String fileName){
+        // Get safe storage directory for photos
+        // Use `getExternalFilesDir` on Context to access package-specific directories.
+        // This way, we don't need to request external read/write runtime permissions.
+        File mediaStorageDir = new File(getExternalFilesDir(Environment.DIRECTORY_PICTURES), TAG);
+
+        // Create the storage directory if it does not exist
+        if (!mediaStorageDir.exists() && !mediaStorageDir.mkdirs()) {
+            Log.d(TAG, "failed to create directory");
+        }
+
+        // Return the file target for the photo based on filename
+        return new File(mediaStorageDir.getPath() + File.separator + fileName);
+    }
+
+
+    private void queryPosts () {
+        ParseQuery<Post> query = ParseQuery.getQuery(Post.class);
+        query.include(Post.KEY_USER);
+        query.findInBackground(new FindCallback<Post>() {
+            @Override
+            public void done(List<Post> posts, ParseException e) {
+                if (e != null) {
+                    Log.e(TAG, "Issue with getting posts", e);
+                    return;
+                }
+                for (Post post : posts) {
+                    Log.i(TAG, "Post: " + post.getDescription() + ", username: " + post.getUser().getUsername());
+                }
+            }
+        });
+    }
+
 }
