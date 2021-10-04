@@ -71,4 +71,5 @@
         app:layout_constraintEnd_toEndOf="@+id/btnCaptureImage"
         app:layout_constraintStart_toStartOf="@+id/btnCaptureImage"
         app:layout_constraintTop_toBottomOf="@+id/btnCaptureImage" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>
