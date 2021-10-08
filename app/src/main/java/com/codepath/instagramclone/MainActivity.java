@@ -26,7 +26,6 @@ import com.parse.ParseUser;
 import com.parse.SaveCallback;
 
 import java.io.File;
-import java.sql.Savepoint;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
@@ -38,6 +37,7 @@ public class MainActivity extends AppCompatActivity {
     private Button btnCaptureImage;
     private Button btnSubmit;
     private Button btnLogOut;
+    private Button btnView;
     private File photoFile;
     public String photoFileName = "photo.jpg";
 
@@ -50,6 +50,7 @@ public class MainActivity extends AppCompatActivity {
         ivPostImage = findViewById(R.id.ivPostImage);
         btnCaptureImage = findViewById(R.id.btnCaptureImage);
         btnSubmit = findViewById(R.id.btnSubmit);
+        btnView = findViewById(R.id.btnView);
         btnLogOut = findViewById(R.id.btnLogOut);
 
         btnCaptureImage.setOnClickListener(new View.OnClickListener() {
@@ -75,6 +76,14 @@ public class MainActivity extends AppCompatActivity {
                 }
                 ParseUser currentUser = ParseUser.getCurrentUser();
                 savePost(description, currentUser, photoFile);
+                //finish();
+            }
+        });
+
+        btnView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(MainActivity.this, "Get posts", Toast.LENGTH_SHORT).show();
             }
         });
 

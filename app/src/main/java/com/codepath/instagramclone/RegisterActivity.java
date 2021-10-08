@@ -37,16 +37,17 @@ public class RegisterActivity extends AppCompatActivity {
             user.setUsername(etUsername.getText().toString());
             user.setEmail(etEmail.getText().toString());
             user.setPassword(etPassword.getText().toString());
-            
+
             user.signUpInBackground(e -> {
                 if (e != null) {
                     Log.e(TAG, "Error signing up");
-                }else{
+                } else {
                     Log.i(TAG, "Sign up successful");
                     goLoginActivity();
                 }
             });
         });
+
 
         TextView btn = findViewById(R.id.alreadyHaveAccount);
         btn.setOnClickListener(new View.OnClickListener() {
